@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 from collections import deque
 
 from dask.core import istask, subs
@@ -100,10 +98,10 @@ class Token(object):
 
 
 # A variable to represent *all* variables in a discrimination net
-VAR = Token('?')
+VAR = Token("?")
 # Represents the end of the traversal of an expression. We can't use `None`,
 # 'False', etc... here, as anything may be an argument to a function.
-END = Token('end')
+END = Token("end")
 
 
 class Node(tuple):
@@ -152,10 +150,11 @@ class RewriteRule(object):
     `(list, (list, 'x'))` is replaced with `(list, 'x')`, where `'x'` is a
     variable.
 
+    >>> import dask.rewrite as dr
     >>> lhs = (list, (list, 'x'))
     >>> rhs = (list, 'x')
     >>> variables = ('x',)
-    >>> rule = RewriteRule(lhs, rhs, variables)
+    >>> rule = dr.RewriteRule(lhs, rhs, variables)
 
     Here's a more complicated rule that uses a callable right-hand-side. A
     callable `rhs` takes in a dictionary mapping variables to their matching
@@ -169,7 +168,7 @@ class RewriteRule(object):
     ...         return x
     ...     else:
     ...         return (list, x)
-    >>> rule = RewriteRule(lhs, repl_list, variables)
+    >>> rule = dr.RewriteRule(lhs, repl_list, variables)
     """
 
     def __init__(self, lhs, rhs, vars=()):
@@ -192,8 +191,7 @@ class RewriteRule(object):
         return term
 
     def __str__(self):
-        return "RewriteRule({0}, {1}, {2})".format(self.lhs, self.rhs,
-                                                   self.vars)
+        return "RewriteRule({0}, {1}, {2})".format(self.lhs, self.rhs, self.vars)
 
     def __repr__(self):
         return str(self)
@@ -209,28 +207,29 @@ class RuleSet(object):
     Examples
     --------
 
+    >>> import dask.rewrite as dr
     >>> def f(*args): pass
     >>> def g(*args): pass
     >>> def h(*args): pass
     >>> from operator import add
 
-    >>> rs = RuleSet(                 # Make RuleSet with two Rules
-    ...         RewriteRule((add, 'x', 0), 'x', ('x',)),
-    ...         RewriteRule((f, (g, 'x'), 'y'),
-    ...                     (h, 'x', 'y'),
-    ...                     ('x', 'y')))
+    >>> rs = dr.RuleSet(                # doctest: +SKIP
+    ...         dr.RewriteRule((add, 'x', 0), 'x', ('x',)),
+    ...         dr.RewriteRule((f, (g, 'x'), 'y'),
+    ...                        (h, 'x', 'y'),
+    ...                        ('x', 'y')))
 
-    >>> rs.rewrite((add, 2, 0))       # Apply ruleset to single task
+    >>> rs.rewrite((add, 2, 0))         # doctest: +SKIP
     2
 
-    >>> rs.rewrite((f, (g, 'a', 3)))  # doctest: +SKIP
+    >>> rs.rewrite((f, (g, 'a', 3)))    # doctest: +SKIP
     (h, 'a', 3)
 
-    >>> dsk = {'a': (add, 2, 0),      # Apply ruleset to full dask graph
+    >>> dsk = {'a': (add, 2, 0),        # doctest: +SKIP
     ...        'b': (f, (g, 'a', 3))}
 
-    >>> from toolz import valmap
-    >>> valmap(rs.rewrite, dsk)  # doctest: +SKIP
+    >>> from toolz import valmap        # doctest: +SKIP
+    >>> valmap(rs.rewrite, dsk)         # doctest: +SKIP
     {'a': 2,
      'b': (h, 'a', 3)}
 
@@ -368,8 +367,7 @@ def _bottom_up(net, term):
     return net._rewrite(term)
 
 
-strategies = {'top_level': _top_level,
-              'bottom_up': _bottom_up}
+strategies = {"top_level": _top_level, "bottom_up": _bottom_up}
 
 
 def _match(S, N):

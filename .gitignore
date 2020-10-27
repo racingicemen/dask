@@ -1,5 +1,9 @@
-*.pyc
+.hypothesis
+*.py[cod]
+__pycache__/
 *.egg-info
+.mypy_cache
+dask-worker-space/
 docs/build
 build/
 dist/
@@ -9,7 +13,11 @@ log
 .pytest_cache/
 .coverage
 .DS_Store
+*.sqlite
 *.swp
 *.swo
 .cache/
 hdfs-initialized-indicator
+.ipynb_checkpoints
+mydask.png
+.vscode/
